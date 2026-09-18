@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} - Proofly{% endblock %}
+{% block content %}
+<section class="page-shell narrow-shell">
+  <a class="back-link" href="{% url 'dashboard' %}{% if space %}?space={{ space.slug }}{% endif %}">← Back to dashboard</a>
+  <div class="page-heading"><p class="eyebrow">Collection settings</p><h1>{{ title }}</h1><p>Make the form sound like you and collect only the details you need.</p></div>
+  <form method="post" enctype="multipart/form-data" class="settings-card card form-stack">{% csrf_token %}
+    <div class="form-grid">
+      <div class="field"> <label for="{{ form.name.id_for_label }}">Space name</label>{{ form.name }}{% for error in form.name.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>
+      <div class="field"><label for="{{ form.slug.id_for_label }}">Collection URL</label><div class="url-input"><span>/collect/</span>{{ form.slug }}<span>/</span></div>{% for error in form.slug.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>
+    </div>
+    <div class="field"><label for="{{ form.logo.id_for_label }}">Brand logo <span class="optional">(optional)</span></label>{{ form.logo }}{% if space.logo %}<small>Current logo: <a href="{{ space.logo.url }}" target="_blank">view upload</a></small>{% endif %}</div>
+    <div class="field"><label for="{{ form.prompt.id_for_label }}">Your main question</label>{{ form.prompt }}{% for error in form.prompt.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>
+    <div class="field"><label for="{{ form.custom_questions.id_for_label }}">Follow-up questions <span class="optional">(optional)</span></label>{{ form.custom_questions }}<small>{{ form.custom_questions.help_text }}</small></div>
+    <div class="switch-list">
+      <label class="switch-row"><span><strong>Ask for a profile photo</strong><small>Make an avatar required with each testimonial.</small></span><span class="switch">{{ form.require_avatar }}<i></i></span></label>
+      <label class="switch-row"><span><strong>Collect star ratings</strong><small>Let customers rate their experience from 1 to 5.</small></span><span class="switch">{{ form.enable_ratings }}<i></i></span></label>
+    </div>
+    <div class="form-actions"><a class="button button-secondary" href="{% url 'dashboard' %}{% if space %}?space={{ space.slug }}{% endif %}">Cancel</a><button class="button button-primary" type="submit">{{ submit_label }} <span>→</span></button></div>
+  </form>
+</section>
+{% endblock %}

@@ -1,0 +1,4 @@
+{% extends "base.html" %}
+{% block title %}Thank you - {{ space.name }}{% endblock %}
+{% block body_class %}public-page{% endblock %}
+{% block content %}<section class="single-card-wrap"><div class="thank-card card"><div class="success-icon large">✓</div><p class="eyebrow">Feedback sent</p><h1>Thank you for sharing.</h1><p>Your message has been sent to {{ space.name }} for review. It means a lot.</p><a class="button button-secondary" href="{% url 'wall' space.slug %}">See their Wall of Love</a><p class="public-footer">Powered by <strong>Proofly</strong></p></div></section>{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Share your feedback - {{ space.name }}{% endblock %}
+{% block body_class %}public-page{% endblock %}
+{% block content %}
+<section class="collect-wrap">
+  <div class="public-brand">{% if space.logo %}<img src="{{ space.logo.url }}" alt="{{ space.name }}">{% else %}<span class="brand-mark">{{ space.name|slice:':1'|upper }}</span>{% endif %}<strong>{{ space.name }}</strong></div>
+  <div class="collect-card card"><p class="eyebrow">Your voice matters</p><h1>Tell us about your experience</h1><p class="muted">A few honest words help others feel confident choosing {{ space.name }}.</p>
+    <form method="post" enctype="multipart/form-data" class="form-stack testimonial-form">{% csrf_token %}
+      <div class="form-grid"><div class="field"><label for="{{ form.client_name.id_for_label }}">Your name</label>{{ form.client_name }}{% for error in form.client_name.errors %}<p class="error">{{ error }}</p>{% endfor %}</div><div class="field"><label for="{{ form.email.id_for_label }}">Email address</label>{{ form.email }}{% for error in form.email.errors %}<p class="error">{{ error }}</p>{% endfor %}</div></div>
+      <div class="field"><label for="{{ form.company_role.id_for_label }}">Your role or company <span class="optional">(optional)</span></label>{{ form.company_role }}</div>
+      {% if space.enable_ratings %}<div class="field"><label>How would you rate your experience?</label>{{ form.rating }}<div class="rating-picker" data-rating-picker data-input-id="{{ form.rating.id_for_label }}" role="radiogroup" aria-label="Rating">{% for star in '12345' %}<button type="button" data-rating="{{ forloop.counter }}" aria-label="{{ forloop.counter }} out of 5 stars">★</button>{% endfor %}</div><small class="rating-hint" data-rating-hint>Select a rating</small>{% for error in form.rating.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>{% endif %}
+      <div class="field"><label for="{{ form.message.id_for_label }}">{{ form.message.label }}</label>{{ form.message }}{% for error in form.message.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>
+      {% for field in form %}{% if field.name|slice:':7' == 'answer_' %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }} <span class="optional">(optional)</span></label>{{ field }}</div>{% endif %}{% endfor %}
+      <div class="field"><label for="{{ form.avatar.id_for_label }}">Profile photo {% if space.require_avatar %}{% else %}<span class="optional">(optional)</span>{% endif %}</label><div class="file-input">{{ form.avatar }}<span>Upload a photo</span></div>{% for error in form.avatar.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>
+      <button class="button button-primary button-full button-large" type="submit">Send my feedback <span>→</span></button>
+    </form>
+  </div>
+  <p class="public-footer">Powered by <strong>Proofly</strong></p>
+</section>
+{% endblock %}
