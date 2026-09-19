@@ -21,25 +21,74 @@ def home(request):
 def signup(request):
     if request.user.is_authenticated:
         return redirect("dashboard")
+
     form = SignUpForm(request.POST or None)
+
     if request.method == "POST" and form.is_valid():
         user = form.save()
+
         user.email = form.cleaned_data["email"]
         user.save(update_fields=["email"])
-        Profile.objects.get_or_create(user=user)
-        login(request, user)
-        messages.success(request, "Your account is ready. Use the verification link to simulate confirming your email.")
-        return redirect("dashboard")
-    return render(request, "registration/signup.html", {"form": form})
+
+        profile, _ = Profile.objects.get_or_create(user=user)
+
+        # Generate verification URL
+        verification_url = request.build_absolute_uri(
+            reverse("verify_email_token", args=[user.id])
+        )
+
+        # Print verification details in CMD
+        print("\n========================================")
+        print("        EMAIL VERIFICATION")
+        print("========================================")
+        print(f"Email: {user.email}")
+        print(f"Verification URL: {verification_url}")
+        print("========================================\n")
+
+        messages.success(
+            request,
+            "Account created! Check the terminal for your email verification link."
+        )
+
+        # DO NOT login and DO NOT go to dashboard
+        return render(
+            request,
+            "registration/signup.html",
+            {
+                "form": SignUpForm(),
+                "verification_url": verification_url,
+                "verification_email": user.email,
+            }
+        )
+
+    return render(
+        request,
+        "registration/signup.html",
+        {"form": form}
+    )
 
 
-@login_required
-def verify_email(request):
-    profile, _ = Profile.objects.get_or_create(user=request.user)
+# @login_required
+def verify_email_token(request, user_id):
+    User = Profile._meta.get_field("user").remote_field.model
+
+    user = get_object_or_404(User, id=user_id)
+
+    profile, _ = Profile.objects.get_or_create(user=user)
+
+    if profile.email_verified:
+        messages.info(request, "Email is already verified.")
+        return redirect("login")
+
     profile.email_verified = True
     profile.save(update_fields=["email_verified"])
-    messages.success(request, "Email verified. Your Proofly account is all set.")
-    return redirect("dashboard")
+
+    messages.success(
+        request,
+        "Email verified successfully! You can now login."
+    )
+
+    return redirect("login")
 
 
 @login_required
