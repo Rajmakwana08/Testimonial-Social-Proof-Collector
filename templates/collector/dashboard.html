@@ -1,48 +1,720 @@
 {% extends "base.html" %}
-{% block title %}Dashboard - Proofly{% endblock %}
+
+{% block title %}
+    Dashboard - Proofly
+{% endblock %}
+
 {% block content %}
 <section class="dashboard-shell">
-  <aside class="dashboard-side">
-    <div class="side-label">Your spaces</div>
-    <nav class="space-list" aria-label="Your spaces">
-      {% for item in spaces %}<a class="space-item {% if item.id == space.id %}active{% endif %}" href="{% url 'dashboard' %}?space={{ item.slug }}"><span class="space-dot">{{ item.name|slice:':1'|upper }}</span><span>{{ item.name }}</span></a>{% endfor %}
-    </nav>
-    <a class="new-space" href="{% url 'space_create' %}"><span>+</span> New space</a>
-    <div class="side-help"><span class="help-icon">?</span><div><strong>Need help?</strong><small>Your public page is ready to share.</small></div></div>
-  </aside>
-  <div class="dashboard-main">
-    <div class="dashboard-heading">
-      <div><p class="eyebrow">{{ space.name }}</p><h1>Testimonials</h1><p class="muted">Review and turn customer feedback into social proof.</p></div>
-      <div class="heading-actions"><a class="button button-secondary" href="{% url 'space_edit' space.slug %}">Settings</a><a class="button button-primary" target="_blank" href="{% url 'collect_testimonial' space.slug %}">Open collection page ↗</a></div>
+
+    <aside class="dashboard-side">
+
+        <div class="side-label">
+            Your spaces
+        </div>
+
+        <nav
+            class="space-list"
+            aria-label="Your spaces"
+        >
+            {% for item in spaces %}
+                <a
+                    class="space-item {% if item.id == space.id %}active{% endif %}"
+                    href="{% url 'dashboard' %}?space={{ item.slug }}"
+                >
+                    <span class="space-dot">
+                        {{ item.name|slice:':1'|upper }}
+                    </span>
+
+                    <span>
+                        {{ item.name }}
+                    </span>
+                </a>
+            {% endfor %}
+        </nav>
+
+        <a
+            class="new-space"
+            href="{% url 'space_create' %}"
+        >
+            <span>+</span>
+            New space
+        </a>
+
+        <div class="side-help">
+
+            <span class="help-icon">
+                ?
+            </span>
+
+            <div>
+                <strong>
+                    Need help?
+                </strong>
+
+                <small>
+                    Your public page is ready to share.
+                </small>
+            </div>
+
+        </div>
+
+    </aside>
+
+    <div class="dashboard-main">
+
+        <div class="dashboard-heading">
+
+            <div>
+
+                <p class="eyebrow">
+                    {{ space.name }}
+                </p>
+
+                <h1>
+                    Testimonials
+                </h1>
+
+                <p class="muted">
+                    Review and turn customer feedback into social proof.
+                </p>
+
+            </div>
+
+            <div class="heading-actions">
+
+                <a
+                    class="button button-secondary"
+                    href="{% url 'space_edit' space.slug %}"
+                >
+                    Settings
+                </a>
+
+                <a
+                    class="button button-primary"
+                    target="_blank"
+                    href="{% url 'collect_testimonial' space.slug %}"
+                >
+                    Open collection page ↗
+                </a>
+
+            </div>
+
+        </div>
+
+        {% if not user.profile.email_verified %}
+            <div class="verify-banner">
+
+                <span>
+                    ✦
+                </span>
+
+                <p>
+                    Your email is not verified yet.
+                    <a href="{% url 'verify_email' %}">
+                        Verify it now
+                    </a>
+                    to complete the account setup.
+                </p>
+
+            </div>
+        {% endif %}
+
+        <div class="metrics-grid">
+
+            <article class="metric-card card">
+
+                <span class="metric-icon peach">
+                    ★
+                </span>
+
+                <div>
+
+                    <span class="metric-label">
+                        Average rating
+                    </span>
+
+                    <strong>
+                        {% if metrics.average %}
+                            {{ metrics.average|floatformat:1 }}
+                        {% else %}
+                            —
+                        {% endif %}
+                    </strong>
+
+                    <small>
+                        from approved reviews
+                    </small>
+
+                </div>
+
+            </article>
+
+            <article class="metric-card card">
+
+                <span class="metric-icon lilac">
+                    ✦
+                </span>
+
+                <div>
+
+                    <span class="metric-label">
+                        Approved stories
+                    </span>
+
+                    <strong>
+                        {{ metrics.total }}
+                    </strong>
+
+                    <small>
+                        ready to showcase
+                    </small>
+
+                </div>
+
+            </article>
+
+            <article class="metric-card card distribution-card">
+
+                <div>
+
+                    <span class="metric-label">
+                        Rating distribution
+                    </span>
+
+                    <div class="bars">
+
+                        {% for star, count in distribution.items %}
+
+                            <div class="bar-row">
+
+                                <span>
+                                    {{ star }}★
+                                </span>
+
+                                <i>
+                                    <b
+                                        style="width: {% widthratio count metrics.total 100 %}%"
+                                    ></b>
+                                </i>
+
+                                <em>
+                                    {{ count }}
+                                </em>
+
+                            </div>
+
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+            </article>
+
+        </div>
+
+        <div class="share-strip card">
+
+            <div>
+
+                <span class="share-icon">
+                    ↗
+                </span>
+
+                <div>
+
+                    <strong>
+                        Ready to collect more feedback?
+                    </strong>
+
+                    <small>
+                        Share your personal collection link with customers.
+                    </small>
+
+                </div>
+
+            </div>
+
+            <div class="share-actions">
+
+                <code id="collection-link">
+                    {{ request.scheme }}://{{ request.get_host }}{% url 'collect_testimonial' space.slug %}
+                </code>
+
+                <button
+                    class="icon-button"
+                    data-copy-target="collection-link"
+                    aria-label="Copy collection link"
+                >
+                    ⧉
+                </button>
+
+            </div>
+
+        </div>
+
+        <div class="reviews-section">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Inbox
+                    </h2>
+
+                    <p>
+                        {{ status_counts.all }} testimonial{{ status_counts.all|pluralize }}
+                        in this space
+                    </p>
+
+                </div>
+
+                <button
+                    class="button button-secondary"
+                    data-modal-open="embed-modal"
+                >
+                    Get embed code
+                </button>
+
+            </div>
+
+            <div
+                class="tabs"
+                role="tablist"
+            >
+
+                <a
+                    class="tab {% if status == 'all' %}active{% endif %}"
+                    href="{% url 'dashboard' %}?space={{ space.slug }}"
+                >
+                    All
+                    <span>
+                        {{ status_counts.all }}
+                    </span>
+                </a>
+
+                <a
+                    class="tab {% if status == 'pending' %}active{% endif %}"
+                    href="{% url 'dashboard' %}?space={{ space.slug }}&status=pending"
+                >
+                    Pending
+                    <span>
+                        {{ status_counts.pending }}
+                    </span>
+                </a>
+
+                <a
+                    class="tab {% if status == 'approved' %}active{% endif %}"
+                    href="{% url 'dashboard' %}?space={{ space.slug }}&status=approved"
+                >
+                    Approved
+                    <span>
+                        {{ status_counts.approved }}
+                    </span>
+                </a>
+
+                <a
+                    class="tab {% if status == 'rejected' %}active{% endif %}"
+                    href="{% url 'dashboard' %}?space={{ space.slug }}&status=rejected"
+                >
+                    Rejected
+                    <span>
+                        {{ status_counts.rejected }}
+                    </span>
+                </a>
+
+                <a
+                    class="tab {% if status == 'archived' %}active{% endif %}"
+                    href="{% url 'dashboard' %}?space={{ space.slug }}&status=archived"
+                >
+                    Archived
+                    <span>
+                        {{ status_counts.archived }}
+                    </span>
+                </a>
+
+            </div>
+
+            <form
+                class="filters"
+                method="get"
+            >
+
+                <input
+                    type="hidden"
+                    name="space"
+                    value="{{ space.slug }}"
+                >
+
+                <div class="search-box">
+
+                    <span>
+                        ⌕
+                    </span>
+
+                    <input
+                        name="q"
+                        value="{{ search }}"
+                        placeholder="Search names, emails, or feedback"
+                    >
+
+                </div>
+
+                <select name="rating">
+
+                    <option value="">
+                        Any rating
+                    </option>
+
+                    {% for number in '12345' %}
+
+                        <option
+                            value="{{ number }}"
+                            {% if rating == number %}selected{% endif %}
+                        >
+                            {{ number }} star{{ number|pluralize }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button
+                    class="button button-secondary"
+                    type="submit"
+                >
+                    Filter
+                </button>
+
+                {% if search or rating %}
+                    <a
+                        class="clear-filter"
+                        href="{% url 'dashboard' %}?space={{ space.slug }}&status={{ status }}"
+                    >
+                        Clear
+                    </a>
+                {% endif %}
+
+            </form>
+
+            <div class="review-list">
+
+                {% for testimonial in testimonials %}
+
+                    <article class="review-card card">
+
+                        <div class="review-avatar">
+
+                            {% if testimonial.avatar %}
+                                <img
+                                    src="{{ testimonial.avatar.url }}"
+                                    alt="{{ testimonial.client_name }}"
+                                >
+                            {% else %}
+                                {{ testimonial.client_name|slice:':1'|upper }}
+                            {% endif %}
+
+                        </div>
+
+                        <div class="review-content">
+
+                            <div class="review-topline">
+
+                                <div>
+
+                                    <h3>
+
+                                        {{ testimonial.client_name }}
+
+                                        {% if testimonial.is_featured %}
+                                            <span
+                                                class="featured-mark"
+                                                title="Featured"
+                                            >
+                                                ✦
+                                            </span>
+                                        {% endif %}
+
+                                    </h3>
+
+                                    <p>
+                                        {{ testimonial.company_role|default:'Customer' }}
+                                        ·
+                                        {{ testimonial.created_at|date:'M j, Y' }}
+                                    </p>
+
+                                </div>
+
+                                <span class="status-pill {{ testimonial.status }}">
+                                    {{ testimonial.get_status_display }}
+                                </span>
+
+                            </div>
+
+                            {% if testimonial.rating %}
+
+                                <div class="stars">
+
+                                    {% for star in '12345' %}
+
+                                        {% if forloop.counter <= testimonial.rating %}
+                                            ★
+                                        {% else %}
+                                            <span>★</span>
+                                        {% endif %}
+
+                                    {% endfor %}
+
+                                </div>
+
+                            {% endif %}
+
+                            <p class="review-message">
+                                “{{ testimonial.message }}”
+                            </p>
+
+                            {% if testimonial.answers %}
+
+                                <div class="answer-list">
+
+                                    {% for question, answer in testimonial.answers.items %}
+
+                                        <p>
+                                            <strong>
+                                                {{ question }}
+                                            </strong>
+
+                                            {{ answer }}
+                                        </p>
+
+                                    {% endfor %}
+
+                                </div>
+
+                            {% endif %}
+
+                            <div class="review-actions">
+
+                                <form
+                                    method="post"
+                                    action="{% url 'testimonial_action' testimonial.id 'feature' %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="next"
+                                        value="{{ request.get_full_path }}"
+                                    >
+
+                                    <button
+                                        class="text-button"
+                                        type="submit"
+                                    >
+                                        {% if testimonial.is_featured %}
+                                            Unfeature
+                                        {% else %}
+                                            Feature
+                                        {% endif %}
+                                    </button>
+
+                                </form>
+
+                                <form
+                                    method="post"
+                                    action="{% url 'testimonial_action' testimonial.id 'like' %}"
+                                >
+                                    {% csrf_token %}
+
+                                    <input
+                                        type="hidden"
+                                        name="next"
+                                        value="{{ request.get_full_path }}"
+                                    >
+
+                                    <button
+                                        class="text-button"
+                                        type="submit"
+                                    >
+                                        {% if testimonial.is_liked %}
+                                            ♥ Liked
+                                        {% else %}
+                                            ♡ Like
+                                        {% endif %}
+                                    </button>
+
+                                </form>
+
+                                {% if testimonial.status != 'approved' %}
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'testimonial_action' testimonial.id 'approve' %}"
+                                    >
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="next"
+                                            value="{{ request.get_full_path }}"
+                                        >
+
+                                        <button
+                                            class="button button-small button-primary"
+                                        >
+                                            Approve
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                                {% if testimonial.status != 'rejected' %}
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'testimonial_action' testimonial.id 'reject' %}"
+                                    >
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="next"
+                                            value="{{ request.get_full_path }}"
+                                        >
+
+                                        <button
+                                            class="button button-small button-danger"
+                                        >
+                                            Reject
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                                {% if testimonial.status != 'archived' %}
+
+                                    <form
+                                        method="post"
+                                        action="{% url 'testimonial_action' testimonial.id 'archive' %}"
+                                    >
+                                        {% csrf_token %}
+
+                                        <input
+                                            type="hidden"
+                                            name="next"
+                                            value="{{ request.get_full_path }}"
+                                        >
+
+                                        <button
+                                            class="icon-button"
+                                            title="Archive"
+                                        >
+                                            ⌑
+                                        </button>
+
+                                    </form>
+
+                                {% endif %}
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                {% empty %}
+
+                    <div class="empty-state card">
+
+                        <div class="empty-art">
+                            ✦
+                        </div>
+
+                        <h3>
+                            No testimonials found
+                        </h3>
+
+                        <p>
+                            Once customers respond, their feedback will appear here
+                            for you to review.
+                        </p>
+
+                        <a
+                            class="button button-primary"
+                            target="_blank"
+                            href="{% url 'collect_testimonial' space.slug %}"
+                        >
+                            View collection page
+                        </a>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        </div>
+
     </div>
-    {% if not user.profile.email_verified %}<div class="verify-banner"><span>✦</span><p>Your email is not verified yet. <a href="{% url 'verify_email' %}">Verify it now</a> to complete the account setup.</p></div>{% endif %}
-    <div class="metrics-grid">
-      <article class="metric-card card"><span class="metric-icon peach">★</span><div><span class="metric-label">Average rating</span><strong>{% if metrics.average %}{{ metrics.average|floatformat:1 }}{% else %}—{% endif %}</strong><small>from approved reviews</small></div></article>
-      <article class="metric-card card"><span class="metric-icon lilac">✦</span><div><span class="metric-label">Approved stories</span><strong>{{ metrics.total }}</strong><small>ready to showcase</small></div></article>
-      <article class="metric-card card distribution-card"><div><span class="metric-label">Rating distribution</span><div class="bars">{% for star, count in distribution.items %}<div class="bar-row"><span>{{ star }}★</span><i><b style="width: {% widthratio count metrics.total 100 %}%"></b></i><em>{{ count }}</em></div>{% endfor %}</div></div></article>
-    </div>
-    <div class="share-strip card"><div><span class="share-icon">↗</span><div><strong>Ready to collect more feedback?</strong><small>Share your personal collection link with customers.</small></div></div><div class="share-actions"><code id="collection-link">{{ request.scheme }}://{{ request.get_host }}{% url 'collect_testimonial' space.slug %}</code><button class="icon-button" data-copy-target="collection-link" aria-label="Copy collection link">⧉</button></div></div>
-    <div class="reviews-section">
-      <div class="section-heading"><div><h2>Inbox</h2><p>{{ status_counts.all }} testimonial{{ status_counts.all|pluralize }} in this space</p></div><button class="button button-secondary" data-modal-open="embed-modal">Get embed code</button></div>
-      <div class="tabs" role="tablist">
-        <a class="tab {% if status == 'all' %}active{% endif %}" href="{% url 'dashboard' %}?space={{ space.slug }}">All <span>{{ status_counts.all }}</span></a>
-        <a class="tab {% if status == 'pending' %}active{% endif %}" href="{% url 'dashboard' %}?space={{ space.slug }}&status=pending">Pending <span>{{ status_counts.pending }}</span></a>
-        <a class="tab {% if status == 'approved' %}active{% endif %}" href="{% url 'dashboard' %}?space={{ space.slug }}&status=approved">Approved <span>{{ status_counts.approved }}</span></a>
-        <a class="tab {% if status == 'rejected' %}active{% endif %}" href="{% url 'dashboard' %}?space={{ space.slug }}&status=rejected">Rejected <span>{{ status_counts.rejected }}</span></a>
-        <a class="tab {% if status == 'archived' %}active{% endif %}" href="{% url 'dashboard' %}?space={{ space.slug }}&status=archived">Archived <span>{{ status_counts.archived }}</span></a>
-      </div>
-      <form class="filters" method="get"><input type="hidden" name="space" value="{{ space.slug }}"><div class="search-box"><span>⌕</span><input name="q" value="{{ search }}" placeholder="Search names, emails, or feedback"></div><select name="rating"><option value="">Any rating</option>{% for number in '12345' %}<option value="{{ number }}" {% if rating == number %}selected{% endif %}>{{ number }} star{{ number|pluralize }}</option>{% endfor %}</select><button class="button button-secondary" type="submit">Filter</button>{% if search or rating %}<a class="clear-filter" href="{% url 'dashboard' %}?space={{ space.slug }}&status={{ status }}">Clear</a>{% endif %}</form>
-      <div class="review-list">
-        {% for testimonial in testimonials %}
-          <article class="review-card card">
-            <div class="review-avatar">{% if testimonial.avatar %}<img src="{{ testimonial.avatar.url }}" alt="{{ testimonial.client_name }}">{% else %}{{ testimonial.client_name|slice:':1'|upper }}{% endif %}</div>
-            <div class="review-content"><div class="review-topline"><div><h3>{{ testimonial.client_name }} {% if testimonial.is_featured %}<span class="featured-mark" title="Featured">✦</span>{% endif %}</h3><p>{{ testimonial.company_role|default:'Customer' }} · {{ testimonial.created_at|date:'M j, Y' }}</p></div><span class="status-pill {{ testimonial.status }}">{{ testimonial.get_status_display }}</span></div>{% if testimonial.rating %}<div class="stars">{% for star in '12345' %}{% if forloop.counter <= testimonial.rating %}★{% else %}<span>★</span>{% endif %}{% endfor %}</div>{% endif %}<p class="review-message">“{{ testimonial.message }}”</p>{% if testimonial.answers %}<div class="answer-list">{% for question, answer in testimonial.answers.items %}<p><strong>{{ question }}</strong>{{ answer }}</p>{% endfor %}</div>{% endif %}<div class="review-actions"><form method="post" action="{% url 'testimonial_action' testimonial.id 'feature' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="text-button" type="submit">{% if testimonial.is_featured %}Unfeature{% else %}Feature{% endif %}</button></form><form method="post" action="{% url 'testimonial_action' testimonial.id 'like' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="text-button" type="submit">{% if testimonial.is_liked %}♥ Liked{% else %}♡ Like{% endif %}</button></form>{% if testimonial.status != 'approved' %}<form method="post" action="{% url 'testimonial_action' testimonial.id 'approve' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="button button-small button-primary">Approve</button></form>{% endif %}{% if testimonial.status != 'rejected' %}<form method="post" action="{% url 'testimonial_action' testimonial.id 'reject' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="button button-small button-danger">Reject</button></form>{% endif %}{% if testimonial.status != 'archived' %}<form method="post" action="{% url 'testimonial_action' testimonial.id 'archive' %}">{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="icon-button" title="Archive">⌑</button></form>{% endif %}</div></div>
-          </article>
-        {% empty %}<div class="empty-state card"><div class="empty-art">✦</div><h3>No testimonials found</h3><p>Once customers respond, their feedback will appear here for you to review.</p><a class="button button-primary" target="_blank" href="{% url 'collect_testimonial' space.slug %}">View collection page</a></div>
-        {% endfor %}
-      </div>
-    </div>
-  </div>
+
 </section>
-<div class="modal-backdrop" id="embed-modal" aria-hidden="true"><div class="modal card" role="dialog" aria-modal="true" aria-labelledby="embed-title"><button class="modal-close" data-modal-close aria-label="Close">×</button><p class="eyebrow">Share approved reviews</p><h2 id="embed-title">Embed your Wall of Love</h2><p class="muted">Paste this responsive iframe anywhere you can add HTML.</p><pre id="embed-code">&lt;iframe src=&quot;{{ embed_url }}&quot; title=&quot;{{ space.name }} testimonials&quot; width=&quot;100%&quot; height=&quot;680&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</pre><button class="button button-primary button-full" data-copy-target="embed-code">Copy embed code</button><a class="preview-link" target="_blank" href="{% url 'wall' space.slug %}">Preview full Wall of Love ↗</a></div></div>
+
+<div
+    class="modal-backdrop"
+    id="embed-modal"
+    aria-hidden="true"
+>
+
+    <div
+        class="modal card"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="embed-title"
+    >
+
+        <button
+            class="modal-close"
+            data-modal-close
+            aria-label="Close"
+        >
+            ×
+        </button>
+
+        <p class="eyebrow">
+            Share approved reviews
+        </p>
+
+        <h2 id="embed-title">
+            Embed your Wall of Love
+        </h2>
+
+        <p class="muted">
+            Paste this responsive iframe anywhere you can add HTML.
+        </p>
+
+        <pre id="embed-code">&lt;iframe src=&quot;{{ embed_url }}&quot; title=&quot;{{ space.name }} testimonials&quot; width=&quot;100%&quot; height=&quot;680&quot; frameborder=&quot;0&quot;&gt;&lt;/iframe&gt;</pre>
+
+        <button
+            class="button button-primary button-full"
+            data-copy-target="embed-code"
+        >
+            Copy embed code
+        </button>
+
+        <a
+            class="preview-link"
+            target="_blank"
+            href="{% url 'wall' space.slug %}"
+        >
+            Preview full Wall of Love ↗
+        </a>
+
+    </div>
+
+</div>
+
 {% endblock %}

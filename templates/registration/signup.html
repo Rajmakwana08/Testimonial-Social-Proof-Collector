@@ -1,12 +1,85 @@
 {% extends "base.html" %}
-{% block title %}Create your account - Proofly{% endblock %}
-{% block body_class %}auth-page{% endblock %}
+
+{% block title %}
+    Create your account - Proofly
+{% endblock %}
+
+{% block body_class %}
+    auth-page
+{% endblock %}
+
 {% block content %}
 <section class="auth-layout compact-auth">
-  <div class="auth-intro"><p class="eyebrow">Start collecting today</p><h1>A warm welcome for every customer story.</h1><p>Create your free owner account, then launch a collection page in minutes.</p></div>
-  <div class="auth-card card"><p class="eyebrow">New owner</p><h2>Create your account</h2><form method="post" class="form-stack">{% csrf_token %}
-    {% for field in form %}<div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% if field.help_text %}<small>{{ field.help_text }}</small>{% endif %}{% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>{% endfor %}
-    <button class="button button-primary button-full" type="submit">Create account <span>→</span></button>
-  </form><p class="form-footer">Already have an account? <a href="{% url 'login' %}">Sign in</a></p></div>
+
+    <div class="auth-intro">
+        <p class="eyebrow">
+            Start collecting today
+        </p>
+
+        <h1>
+            A warm welcome for every customer story.
+        </h1>
+
+        <p>
+            Create your free owner account, then launch a collection page
+            in minutes.
+        </p>
+    </div>
+
+    <div class="auth-card card">
+
+        <p class="eyebrow">
+            New owner
+        </p>
+
+        <h2>
+            Create your account
+        </h2>
+
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="field">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% if field.help_text %}
+                        <small>
+                            {{ field.help_text }}
+                        </small>
+                    {% endif %}
+
+                    {% for error in field.errors %}
+                        <p class="error">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+
+                </div>
+            {% endfor %}
+
+            <button
+                class="button button-primary button-full"
+                type="submit"
+            >
+                Create account
+                <span>→</span>
+            </button>
+        </form>
+
+        <p class="form-footer">
+            Already have an account?
+            <a href="{% url 'login' %}">
+                Sign in
+            </a>
+        </p>
+
+    </div>
+
 </section>
 {% endblock %}

@@ -1,2 +1,121 @@
 {% load static %}
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="{% static 'css/app.css' %}"></head><body class="embed-body"><section class="embed-shell"><div class="embed-heading"><span class="brand-mark">{{ space.name|slice:':1'|upper }}</span><div><strong>{{ space.name }}</strong><small>What customers are saying</small></div><a href="{% url 'wall' space.slug %}" target="_blank">View all →</a></div><div class="embed-grid">{% for testimonial in testimonials %}<article class="embed-card"><div class="stars">{% if testimonial.rating %}{% for star in '12345' %}{% if forloop.counter <= testimonial.rating %}★{% else %}<span>★</span>{% endif %}{% endfor %}{% endif %}</div><p>“{{ testimonial.message|truncatechars:180 }}”</p><strong>{{ testimonial.client_name }}</strong><small>{{ testimonial.company_role|default:'Customer' }}</small></article>{% empty %}<p class="embed-empty">Testimonials will appear here soon.</p>{% endfor %}</div></section></body></html>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.googleapis.com"
+    >
+
+    <link
+        rel="preconnect"
+        href="https://fonts.gstatic.com"
+        crossorigin
+    >
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/app.css' %}"
+    >
+
+</head>
+
+<body class="embed-body">
+
+<section class="embed-shell">
+
+    <div class="embed-heading">
+
+        <span class="brand-mark">
+            {{ space.name|slice:':1'|upper }}
+        </span>
+
+        <div>
+
+            <strong>
+                {{ space.name }}
+            </strong>
+
+            <small>
+                What customers are saying
+            </small>
+
+        </div>
+
+        <a
+            href="{% url 'wall' space.slug %}"
+            target="_blank"
+        >
+            View all →
+        </a>
+
+    </div>
+
+    <div class="embed-grid">
+
+        {% for testimonial in testimonials %}
+
+            <article class="embed-card">
+
+                <div class="stars">
+
+                    {% if testimonial.rating %}
+
+                        {% for star in '12345' %}
+
+                            {% if forloop.counter <= testimonial.rating %}
+                                ★
+                            {% else %}
+                                <span>★</span>
+                            {% endif %}
+
+                        {% endfor %}
+
+                    {% endif %}
+
+                </div>
+
+                <p>
+                    “{{ testimonial.message|truncatechars:180 }}”
+                </p>
+
+                <strong>
+                    {{ testimonial.client_name }}
+                </strong>
+
+                <small>
+                    {{ testimonial.company_role|default:'Customer' }}
+                </small>
+
+            </article>
+
+        {% empty %}
+
+            <p class="embed-empty">
+                Testimonials will appear here soon.
+            </p>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+</body>
+
+</html>

@@ -1,26 +1,114 @@
 {% extends "base.html" %}
-{% block title %}Welcome back - Proofly{% endblock %}
-{% block body_class %}auth-page{% endblock %}
+
+{% block title %}
+    Welcome back - Proofly
+{% endblock %}
+
+{% block body_class %}
+    auth-page
+{% endblock %}
+
 {% block content %}
 <section class="auth-layout">
-  <div class="auth-intro">
-    <p class="eyebrow">Social proof, made simple</p>
-    <h1>Turn kind words into your strongest marketing.</h1>
-    <p>Collect feedback in a beautiful form, approve it in one place, and share it anywhere.</p>
-    <div class="mini-proof"><span class="avatar-initial">S</span><div><div class="stars">★★★★★</div><strong>“Finally, testimonials we can actually use.”</strong><small>Sam, Brightside</small></div></div>
-  </div>
-  <div class="auth-card card">
-    <p class="eyebrow">Owner sign in</p>
-    <h2>Welcome back</h2>
-    <p class="muted">Sign in to manage your spaces and reviews.</p>
-    <form method="post" class="form-stack">{% csrf_token %}
-      {% for field in form %}
-        <div class="field"><label for="{{ field.id_for_label }}">{{ field.label }}</label>{{ field }}{% for error in field.errors %}<p class="error">{{ error }}</p>{% endfor %}</div>
-      {% endfor %}
-      {% if form.non_field_errors %}<p class="error">{{ form.non_field_errors|join:', ' }}</p>{% endif %}
-      <button class="button button-primary button-full" type="submit">Sign in <span>→</span></button>
-    </form>
-    <div class="auth-links"><a href="{% url 'password_reset' %}">Forgot password?</a><span>·</span><a href="{% url 'signup' %}">Create an account</a></div>
-  </div>
+
+    <div class="auth-intro">
+
+        <p class="eyebrow">
+            Social proof, made simple
+        </p>
+
+        <h1>
+            Turn kind words into your strongest marketing.
+        </h1>
+
+        <p>
+            Collect feedback in a beautiful form, approve it in one place,
+            and share it anywhere.
+        </p>
+
+        <div class="mini-proof">
+            <span class="avatar-initial">S</span>
+
+            <div>
+                <div class="stars">
+                    ★★★★★
+                </div>
+
+                <strong>
+                    “Finally, testimonials we can actually use.”
+                </strong>
+
+                <small>
+                    Sam, Brightside
+                </small>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="auth-card card">
+
+        <p class="eyebrow">
+            Owner sign in
+        </p>
+
+        <h2>
+            Welcome back
+        </h2>
+
+        <p class="muted">
+            Sign in to manage your spaces and reviews.
+        </p>
+
+        <form method="post" class="form-stack">
+            {% csrf_token %}
+
+            {% for field in form %}
+                <div class="field">
+
+                    <label for="{{ field.id_for_label }}">
+                        {{ field.label }}
+                    </label>
+
+                    {{ field }}
+
+                    {% for error in field.errors %}
+                        <p class="error">
+                            {{ error }}
+                        </p>
+                    {% endfor %}
+
+                </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+                <p class="error">
+                    {{ form.non_field_errors|join:', ' }}
+                </p>
+            {% endif %}
+
+            <button
+                class="button button-primary button-full"
+                type="submit"
+            >
+                Sign in
+                <span>→</span>
+            </button>
+        </form>
+
+        <div class="auth-links">
+            <a href="{% url 'password_reset' %}">
+                Forgot password?
+            </a>
+
+            <span>·</span>
+
+            <a href="{% url 'signup' %}">
+                Create an account
+            </a>
+        </div>
+
+    </div>
+
 </section>
 {% endblock %}
